@@ -49,6 +49,8 @@ public class NetworkMan : MonoBehaviour
     public class Player
     {
         public string id;
+
+        [Serializable]
         public struct receivedColor
         {
             public float r;
@@ -108,6 +110,11 @@ public class NetworkMan : MonoBehaviour
                     break;
                 case commands.UPDATE:
                     lastestGameState = JsonUtility.FromJson<GameState>(returnData);
+                    if (anyNewClient)
+                    {
+                        anyNewClient = false;
+                        ShowAllClient();
+                    }
                     break;
                 default:
                     Debug.Log("Error");
@@ -153,13 +160,17 @@ public class NetworkMan : MonoBehaviour
         if (ClientID == null) return;
         for (int i = 0; i < lastestGameState.players.Length; i++)
         {
-            if (ClientID == newPlayers[i].player.id)
-            {
-                //Debug.Log("Find Update Target");
-                //Debug.Log(new Color(newPlayers[i].player.color.r, newPlayers[i].player.color.g, newPlayers[i].player.color.b));
-                Color color = new Color(newPlayers[i].player.color.r, newPlayers[i].player.color.g, newPlayers[i].player.color.b);
-                newPlayers[i].playerObj.GetComponent<Renderer>().material.SetColor("_Color", color);
-            }
+            // if (ClientID == lastestGameState.players[i].id)
+            // {
+            //Debug.Log("Find Update Target");
+            //Debug.Log(new Color(lastestGameState.players[i].color.r, lastestGameState.players[i].color.g, lastestGameState.players[i].color.b));
+
+            Color color = new Color(lastestGameState.players[i].color.r, lastestGameState.players[i].color.g, lastestGameState.players[i].color.b);
+            newPlayers[i].player.color.r = color.r;
+            newPlayers[i].player.color.g = color.g;
+            newPlayers[i].player.color.b = color.b;
+            newPlayers[i].playerObj.GetComponent<Renderer>().material.SetColor("_Color", color);
+            // }
         }
     }
 
@@ -193,9 +204,9 @@ public class NetworkMan : MonoBehaviour
 
     void ShowAllClient()
     {
-        for (int i = 0; i < newPlayers.Count; i++)
+        for (int i = 0; i < lastestGameState.players.Length; i++)
         {
-            Debug.Log("Current Client(" + i + ") ID: " + newPlayers[i].player.id);
+            Debug.Log("Current Client(" + i + ") ID: " + lastestGameState.players[i].id);
         }
     }
 
