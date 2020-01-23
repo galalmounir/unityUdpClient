@@ -72,6 +72,7 @@ public class NetworkMan : MonoBehaviour
     List<NewPlayer> newPlayers = new List<NewPlayer>();
     public int len = 0;
     public String ClientID = null;
+    bool anyNewClient = false;
 
     [Serializable]
     public class GameState
@@ -102,6 +103,7 @@ public class NetworkMan : MonoBehaviour
             switch (latestMessage.cmd)
             {
                 case commands.NEW_CLIENT:
+                    anyNewClient = true;
                     Debug.Log("New Client Entered");
                     break;
                 case commands.UPDATE:
@@ -129,7 +131,6 @@ public class NetworkMan : MonoBehaviour
         }
         while (len <= lastestGameState.players.Length - 1)
         {
-            Debug.Log(len + ", " + lastestGameState.players.Length);
             NewPlayer temp = new NewPlayer();
             temp.playerObj = GameObject.CreatePrimitive(PrimitiveType.Cube);
             Renderer rend = temp.playerObj.GetComponent<Renderer>();
@@ -149,20 +150,22 @@ public class NetworkMan : MonoBehaviour
 
     void UpdatePlayers()
     {
+        if (ClientID == null) return;
         for (int i = 0; i < lastestGameState.players.Length; i++)
         {
             if (ClientID == newPlayers[i].player.id)
             {
                 //Debug.Log("Find Update Target");
-                newPlayers[i].playerObj.GetComponent<Renderer>().material.color =
-                new Color(newPlayers[i].player.color.r, newPlayers[i].player.color.g, newPlayers[i].player.color.b);
+                //Debug.Log(new Color(newPlayers[i].player.color.r, newPlayers[i].player.color.g, newPlayers[i].player.color.b));
+                Color color = new Color(newPlayers[i].player.color.r, newPlayers[i].player.color.g, newPlayers[i].player.color.b);
+                newPlayers[i].playerObj.GetComponent<Renderer>().material.SetColor("_Color", color);
             }
         }
     }
 
-    void DestroyPlayers()
+    bool DestroyPlayers()
     {
-        if(lastestGameState.players.Length < len)
+        if (lastestGameState.players.Length < len)
         {
             for (int i = 0; i < lastestGameState.players.Length; i++)
             {
@@ -173,8 +176,26 @@ public class NetworkMan : MonoBehaviour
                     newPlayers[i].player = null;
                     newPlayers.RemoveAt(i);
                     len--;
+                    return true;
                 }
             }
+        }
+        return false;
+    }
+
+    void RelocateBox()
+    {
+        for (int i = 0; i < lastestGameState.players.Length; i++)
+        {
+            newPlayers[i].playerObj.transform.position = new Vector3(i * 2, 0, 0);
+        }
+    }
+
+    void ShowAllClient()
+    {
+        for (int i = 0; i < newPlayers.Count; i++)
+        {
+            Debug.Log("Current Client(" + i + ") ID: " + newPlayers[i].player.id);
         }
     }
 
@@ -188,6 +209,10 @@ public class NetworkMan : MonoBehaviour
     {
         SpawnPlayers();
         UpdatePlayers();
-        DestroyPlayers();
+        if (DestroyPlayers())
+        {
+            ShowAllClient();
+            RelocateBox();
+        }
     }
 }
