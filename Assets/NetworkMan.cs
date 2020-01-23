@@ -166,7 +166,7 @@ public class NetworkMan : MonoBehaviour
         {
             for (int i = 0; i < lastestGameState.players.Length; i++)
             {
-                if (ClientID == newPlayers[i].player.id)
+                if (ClientID == lastestGameState.players[i].id)
                 {
                     Destroy(newPlayers[i].playerObj);
                     newPlayers[i].playerObj = null;
