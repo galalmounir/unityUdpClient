@@ -163,7 +163,7 @@ public class NetworkMan : MonoBehaviour
             // if (ClientID == lastestGameState.players[i].id)
             // {
             //Debug.Log("Find Update Target");
-            //Debug.Log(new Color(lastestGameState.players[i].color.r, lastestGameState.players[i].color.g, lastestGameState.players[i].color.b));
+            Debug.Log(new Color(lastestGameState.players[i].color.r, lastestGameState.players[i].color.g, lastestGameState.players[i].color.b));
 
             Color color = new Color(lastestGameState.players[i].color.r, lastestGameState.players[i].color.g, lastestGameState.players[i].color.b);
             newPlayers[i].player.color.r = color.r;
@@ -222,6 +222,7 @@ public class NetworkMan : MonoBehaviour
         UpdatePlayers();
         if (DestroyPlayers())
         {
+            Debug.Log("Client Dropped");
             ShowAllClient();
             RelocateBox();
         }
