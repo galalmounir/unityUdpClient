@@ -42,12 +42,13 @@ public class NetworkMan : MonoBehaviour
     
     [Serializable]
     public class Player{
-        public string id;
+        [Serializable]
         public struct receivedColor{
             public float R;
             public float G;
             public float B;
         }
+        public string id;
         public receivedColor color;        
     }
 
